@@ -17,7 +17,6 @@ public interface PizzaRepository extends CrudRepository<Pizza, Long> {
     List<Pizza> findAllByUser(User user);
     int countByUserId(Long userId);
     Pizza findByUserIdAndIsFavoriteTrue(Long userId);
- // Find pizzas by user ordered by creation date (newest first)
     List<Pizza> findByUserIdOrderByCreatedAtDesc(Long userId);
     List<Pizza> findByUserId(Long userId);
     int countByUserIdAndPurchasedTrue(Long userId);

@@ -73,29 +73,20 @@ public class LoginAndRegisterService {
         return null;
     }
     public User updateUser(User user) {
-        // Validate user data if needed
         return userRepo.save(user);
     }
 
     public boolean updatePassword(Long userId, String currentPassword, String newPassword) {
-        // Find the user
         Optional<User> optionalUser = userRepo.findById(userId);
         if (optionalUser.isEmpty()) {
             return false;
         }
-        
         User user = optionalUser.get();
-        
-        // Check if current password matches
         if (!BCrypt.checkpw(currentPassword, user.getPassword())) {
             return false;
         }
-        
-        // Hash the new password
         String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         user.setPassword(hashedNewPassword);
-        
-        // Save the user with the new password
         userRepo.save(user);
         return true;
     }

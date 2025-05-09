@@ -7,17 +7,17 @@
     <meta charset="UTF-8">
     <title>Pizza Pete's - Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pizza-styles.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home-styles.css">
 </head>
 <body>
     <div class="header">
         <h1>PIZZA PETE'S</h1>
     </div>
-
     <div class="container">
         <div class="row mb-4">
             <div class="col-12 text-right">
@@ -29,7 +29,6 @@
                 </nav>
             </div>
         </div>
-
         <c:if test="${not empty successMessage}">
             <div class="alert alert-success">${successMessage}</div>
         </c:if>
@@ -75,14 +74,12 @@
                     <p class="option-description">
                         Let us surprise you with a randomly selected pizza combination.
                     </p>
-                    <a href="${pageContext.request.contextPath}/account" class="btn btn-dark">SURPRISE ME</a>
+                    <a href="${pageContext.request.contextPath}/surprise-pizza" class="btn btn-dark">SURPRISE ME</a>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

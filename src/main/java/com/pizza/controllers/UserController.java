@@ -1,6 +1,9 @@
 package com.pizza.controllers;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -89,8 +92,6 @@ public class UserController {
         }
         User user = loginRegService.findById(id);
         model.addAttribute("user", user);
-        
-        // Add favorite pizza to model if it exists
         Pizza favoritePizza = pizzaService.getFavoriteByUser(id);
         if (favoritePizza != null) {
             model.addAttribute("favoritePizza", favoritePizza);
@@ -114,8 +115,6 @@ public class UserController {
         
         User user = loginRegService.findById(userId);
         model.addAttribute("user", user);
-        
-        // Get all pizza orders for this user (ordered newest first)
         List<Pizza> pizzaOrders = pizzaService.findByUserOrderByCreatedAt(userId);
         model.addAttribute("pizzaOrders", pizzaOrders);
         
@@ -131,7 +130,6 @@ public class UserController {
         
         User user = loginRegService.findById(userId);
         model.addAttribute("user", user);
-        
         return "update-profile.jsp";
     }
     
@@ -147,11 +145,7 @@ public class UserController {
         if (result.hasErrors()) {
             return "update-profile.jsp";
         }
-        
-        // Update user information
         User updatedUser = loginRegService.updateUser(user);
-        
-        // Update session
         session.setAttribute("loggedInUser", updatedUser);
         
         redirectAttributes.addFlashAttribute("successMessage", "Your profile has been updated successfully!");
@@ -182,18 +176,10 @@ public class UserController {
         if (loggedInUser == null) {
             return "redirect:/login";
         }
-        
-        // Instead of saving to database, store in session temporarily
         pizza.setUser(loggedInUser);
-        
-        // Calculate price before storing in session
         double price = pizzaService.calculatePrice(pizza);
-        
-        // Store pizza and price in session
         session.setAttribute("tempPizza", pizza);
         session.setAttribute("tempPrice", price);
-        
-        // Redirect to the order confirmation page without creating database entry
         return "redirect:/pizzas/confirm";
     }
 
@@ -201,19 +187,14 @@ public class UserController {
     public String confirmPizza(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
-        
-        // Get pizza from session instead of database
         Pizza pizza = (Pizza) session.getAttribute("tempPizza");
         if (pizza == null) {
             return "redirect:/pizzas/new";
         }
-        
-        // Get price from session
         double price = (Double) session.getAttribute("tempPrice");
         
         model.addAttribute("pizza", pizza);
         model.addAttribute("price", price);
-        
         return "confirmOrder.jsp";
     }
 
@@ -221,23 +202,14 @@ public class UserController {
     public String purchasePizza(HttpSession session, RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
-        
-        // Get pizza from session
         Pizza pizza = (Pizza) session.getAttribute("tempPizza");
         if (pizza == null) {
             return "redirect:/pizzas/new";
         }
-        
-        // Now actually save the pizza to database
         Pizza savedPizza = pizzaService.savePizza(pizza);
-        
-        // Mark as purchased
         pizzaService.markAsPurchased(savedPizza);
-        
-        // Clear temporary session data
         session.removeAttribute("tempPizza");
         session.removeAttribute("tempPrice");
-        
         redirectAttributes.addFlashAttribute("successMessage", "Your pizza has been purchased successfully!");
         return "redirect:/home";
     }
@@ -251,10 +223,7 @@ public class UserController {
         if (pizza == null || !pizza.getUser().getId().equals(userId)) {
             return "redirect:/home";
         }
-        
-        // Mark as purchased in your system
         pizzaService.markAsPurchased(pizza);
-        
         redirectAttributes.addFlashAttribute("successMessage", "Your pizza has been purchased successfully!");
         return "redirect:/home";
     }
@@ -262,11 +231,9 @@ public class UserController {
     @GetMapping("/reorder-favorite")
     public String reorderFavorite(HttpSession session, RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
-        
         if (userId == null) {
             return "redirect:/login";
         }
-        
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         Pizza favoritePizza = pizzaService.getFavoriteByUser(userId);
         
@@ -274,29 +241,19 @@ public class UserController {
             redirectAttributes.addFlashAttribute("errorMessage", "You don't have a favorite pizza yet! Create one first.");
             return "redirect:/home";
         }
-        
-        // Create a new pizza with the same properties but don't save to DB yet
         Pizza newOrder = new Pizza();
         newOrder.setMethod(favoritePizza.getMethod());
         newOrder.setSize(favoritePizza.getSize());
         newOrder.setCrust(favoritePizza.getCrust());
         newOrder.setQuantity(favoritePizza.getQuantity());
         newOrder.setToppings(favoritePizza.getToppings());
-        newOrder.setIsFavorite(false); // This one is not a favorite by default
+        newOrder.setIsFavorite(false);
         newOrder.setUser(loggedInUser);
-        
-        // Calculate price
         double price = pizzaService.calculatePrice(newOrder);
-        
-        // Store in session
         session.setAttribute("tempPizza", newOrder);
         session.setAttribute("tempPrice", price);
-        
-        // Redirect to confirmation page
         return "redirect:/pizzas/confirm";
     }
-    
-    // New methods for account management
     
     @PostMapping("/pizzas/set-favorite/{id}")
     public String setFavoritePizza(@PathVariable("id") Long pizzaId, HttpSession session, RedirectAttributes redirectAttributes) {
@@ -310,8 +267,6 @@ public class UserController {
             redirectAttributes.addFlashAttribute("errorMessage", "Pizza not found or not authorized.");
             return "redirect:/account";
         }
-        
-        // Set as favorite (this will also unset any existing favorite)
         pizza.setIsFavorite(true);
         pizzaService.savePizza(pizza);
         
@@ -333,24 +288,17 @@ public class UserController {
         }
         
         User loggedInUser = (User) session.getAttribute("loggedInUser");
-        
-        // Create a new pizza with the same properties
         Pizza newOrder = new Pizza();
         newOrder.setMethod(pizza.getMethod());
         newOrder.setSize(pizza.getSize());
         newOrder.setCrust(pizza.getCrust());
         newOrder.setQuantity(pizza.getQuantity());
         newOrder.setToppings(pizza.getToppings());
-        newOrder.setIsFavorite(false); // This one is not a favorite by default
+        newOrder.setIsFavorite(false);
         newOrder.setUser(loggedInUser);
-        
-        // Calculate price
         double price = pizzaService.calculatePrice(newOrder);
-        
-        // Store in session
         session.setAttribute("tempPizza", newOrder);
-        session.setAttribute("tempPrice", price);
-        
+        session.setAttribute("tempPrice", price);        
         return "redirect:/pizzas/confirm";
     }
     
@@ -366,11 +314,51 @@ public class UserController {
             redirectAttributes.addFlashAttribute("errorMessage", "Pizza not found or not authorized.");
             return "redirect:/account";
         }
-        
-        // Delete the pizza
         pizzaService.delete(pizza);
         
         redirectAttributes.addFlashAttribute("successMessage", "Order deleted successfully!");
         return "redirect:/account";
+    }
+    
+    
+    @GetMapping("/surprise-pizza")
+    public String surprisePizza(HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        Pizza randomPizza = new Pizza();
+        String[] methods = {"Pickup", "Delivery"};
+        randomPizza.setMethod(methods[(int) (Math.random() * methods.length)]);
+        String[] sizes = {"Small", "Medium", "Large"};
+        randomPizza.setSize(sizes[(int) (Math.random() * sizes.length)]);
+        String[] crusts = {"Thin", "Regular", "Deep Dish", "Stuffed"};
+        randomPizza.setCrust(crusts[(int) (Math.random() * crusts.length)]);
+        randomPizza.setQuantity((int) (Math.random() * 3) + 1);
+        String[] allToppings = {"Cheese", "Pepperoni", "Sausage", "Mushrooms", "Onions", 
+                              "Green Peppers", "Black Olives", "Bacon", "Ham", "Pineapple"};
+        List<String> selectedToppings = new ArrayList<>();
+        selectedToppings.add("Cheese");
+        int numExtraToppings = (int) (Math.random() * 5);
+        Set<Integer> usedIndices = new HashSet<>();
+        for (int i = 0; i < numExtraToppings; i++) {
+            int index;
+            do {
+                index = (int) (Math.random() * (allToppings.length - 1)) + 1;
+            } while (usedIndices.contains(index));
+            
+            usedIndices.add(index);
+            selectedToppings.add(allToppings[index]);
+        }
+        randomPizza.setToppings(selectedToppings);
+        randomPizza.setIsFavorite(false);
+        randomPizza.setUser(loggedInUser);
+        double price = pizzaService.calculatePrice(randomPizza);
+        session.setAttribute("tempPizza", randomPizza);
+        session.setAttribute("tempPrice", price);
+        
+        return "redirect:/pizzas/confirm";
     }
 }

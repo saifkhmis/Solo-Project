@@ -11,15 +11,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Keep your existing styles.css -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styles.css">
-    <!-- Add the enhanced pizza-specific styles -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pizza-styles.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home-styles.css">
-   
-       
 </head>
 <body>
     <div class="header">
@@ -47,8 +42,6 @@
                 <span class="detail-label"><i class="fas fa-shopping-bag pizza-icon"></i> METHOD:</span>
                 <span class="detail-value">${pizza.method}</span>
             </div>
-            
-            <!-- Show delivery details only if delivery method is selected -->
             <c:if test="${pizza.method == 'Delivery'}">
                 <div class="delivery-details-section">
                     <h3 class="delivery-header">DELIVERY INFORMATION</h3>
@@ -64,7 +57,6 @@
                     </div>
                 </div>
             </c:if>
-            
             <div class="order-detail">
                 <span class="detail-label"><i class="fas fa-sort-numeric-up pizza-icon"></i> QTY:</span>
                 <span class="detail-value">${pizza.quantity}</span>
@@ -111,7 +103,6 @@
             </a>
         </div>
     </div>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

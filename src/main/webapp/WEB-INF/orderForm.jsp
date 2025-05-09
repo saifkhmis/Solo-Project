@@ -20,7 +20,6 @@
                 <a href="/logout" class="btn btn-danger">Logout</a>
             </div>
         </div>
-        
         <c:if test="${not empty errorMessage}">
             <div class="alert alert-danger">${errorMessage}</div>
         </c:if>
