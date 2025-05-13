@@ -1,17 +1,12 @@
 package com.pizza.services;
-
 import java.util.Optional;
-
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-
 import com.pizza.models.LoginUser;
 import com.pizza.models.User;
 import com.pizza.repository.UserRepository;
-
-
 @Service
 public class LoginAndRegisterService {
     
@@ -43,13 +38,11 @@ public class LoginAndRegisterService {
             result.rejectValue("email", "Matches", "Unknown email!");
             return null;
         }
-
         User user = potentialUser.get();
         if(!BCrypt.checkpw(loginUser.getPassword(), user.getPassword())) {
             result.rejectValue("password", "Matches", "Invalid password!");
             return null;
         }
-
         return user;
     }
     
@@ -57,7 +50,6 @@ public class LoginAndRegisterService {
         Optional<User> potentialUser = userRepo.findById(id);
         return potentialUser.orElse(null);
     }
-    
     
     public User updateAddress(Long userId, String address, String city, String state, Double latitude, Double longitude) {
         Optional<User> optionalUser = userRepo.findById(userId);
@@ -72,10 +64,19 @@ public class LoginAndRegisterService {
         }
         return null;
     }
+    
     public User updateUser(User user) {
+        System.out.println("Saving user with ID: " + user.getId());
+        System.out.println("First name: " + user.getFirstName());
+        System.out.println("Email: " + user.getEmail());
         return userRepo.save(user);
     }
-
+    
+    public boolean isEmailTaken(String email, Long currentUserId) {
+        Optional<User> potentialUser = userRepo.findByEmail(email);
+        return potentialUser.isPresent() && !potentialUser.get().getId().equals(currentUserId);
+    }
+    
     public boolean updatePassword(Long userId, String currentPassword, String newPassword) {
         Optional<User> optionalUser = userRepo.findById(userId);
         if (optionalUser.isEmpty()) {

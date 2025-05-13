@@ -49,11 +49,6 @@
                     <p><strong>Address:</strong> ${user.address}</p>
                     <p><strong>City:</strong> ${user.city}, ${user.state}</p>
                 </div>
-                <div>
-                    <a href="${pageContext.request.contextPath}/account/update-profile" class="btn btn-update-profile">
-                        <i class="fas fa-user-edit"></i> Update Profile
-                    </a>
-                </div>
             </div>
         </div>
         <div class="account-section">
@@ -95,27 +90,30 @@
                                         </td>
                                         <td>${pizza.quantity}</td>
                                         <td>${pizza.method}</td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <c:if test="${!pizza.isFavorite}">
-                                                    <form action="${pageContext.request.contextPath}/pizzas/set-favorite/${pizza.id}" method="post" style="display:inline;">
-                                                        <button class="btn btn-warning btn-sm action-btn" title="Mark as Favorite">
-                                                            <i class="far fa-star"></i>
-                                                        </button>
-                                                    </form>
-                                                </c:if>
-                                                <form action="${pageContext.request.contextPath}/pizzas/reorder/${pizza.id}" method="post" style="display:inline;">
-                                                    <button class="btn btn-success btn-sm action-btn" title="Reorder this Pizza">
-                                                        <i class="fas fa-redo"></i>
-                                                    </button>
-                                                </form>
-                                                <form action="${pageContext.request.contextPath}/pizzas/delete/${pizza.id}" method="post" style="display:inline;">
-                                                    <button class="btn btn-danger btn-sm action-btn" title="Delete" onclick="return confirm('Are you sure you want to delete this order?');">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
+<td>
+    <div class="btn-group" role="group">
+        <c:if test="${!pizza.isFavorite}">
+            <form action="${pageContext.request.contextPath}/pizzas/set-favorite/${pizza.id}" method="post" style="display:inline;">
+                <button class="btn btn-warning btn-sm action-btn" title="Mark as Favorite">
+                    <i class="far fa-star"></i>
+                </button>
+            </form>
+        </c:if>
+        <a href="${pageContext.request.contextPath}/pizzas/edit/${pizza.id}" class="btn btn-info btn-sm action-btn" title="Edit Pizza">
+            <i class="fas fa-edit"></i>
+        </a>
+        <form action="${pageContext.request.contextPath}/pizzas/reorder/${pizza.id}" method="post" style="display:inline;">
+            <button class="btn btn-success btn-sm action-btn" title="Reorder this Pizza">
+                <i class="fas fa-redo"></i>
+            </button>
+        </form>
+        <form action="${pageContext.request.contextPath}/pizzas/delete/${pizza.id}" method="post" style="display:inline;">
+            <button class="btn btn-danger btn-sm action-btn" title="Delete" onclick="return confirm('Are you sure you want to delete this order?');">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
                                     </tr>
                                 </c:forEach>
                             </tbody>

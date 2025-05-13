@@ -121,34 +121,50 @@ public class UserController {
         return "account.jsp";
     }
     
-    @GetMapping("/account/update-profile")
-    public String showUpdateProfile(HttpSession session, Model model) {
+    @GetMapping("/pizzas/edit/{id}")
+    public String editPizza(@PathVariable("id") Long id, Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
         
-        User user = loginRegService.findById(userId);
-        model.addAttribute("user", user);
-        return "update-profile.jsp";
+        Pizza pizza = pizzaService.find(id);
+        if (pizza == null || !pizza.getUser().getId().equals(userId)) {
+            return "redirect:/account";
+        }
+        
+        model.addAttribute("pizza", pizza);
+        return "editPizza.jsp";
     }
-    
-    @PostMapping("/account/update-profile")
-    public String processUpdateProfile(@Valid @ModelAttribute("user") User user,
-                                      BindingResult result, HttpSession session,
-                                      RedirectAttributes redirectAttributes) {
+
+    @PostMapping("/pizzas/update/{id}")
+    public String updatePizza(@PathVariable("id") Long id, 
+                             @Valid @ModelAttribute("pizza") Pizza pizza,
+                             BindingResult result,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+        
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
         
         if (result.hasErrors()) {
-            return "update-profile.jsp";
+            return "editPizza.jsp";
         }
-        User updatedUser = loginRegService.updateUser(user);
-        session.setAttribute("loggedInUser", updatedUser);
         
-        redirectAttributes.addFlashAttribute("successMessage", "Your profile has been updated successfully!");
+        Pizza existingPizza = pizzaService.find(id);
+        if (existingPizza == null || !existingPizza.getUser().getId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Pizza not found or not authorized.");
+            return "redirect:/account";
+        }
+        existingPizza.setMethod(pizza.getMethod());
+        existingPizza.setSize(pizza.getSize());
+        existingPizza.setCrust(pizza.getCrust());
+        existingPizza.setQuantity(pizza.getQuantity());
+        existingPizza.setToppings(pizza.getToppings());
+        pizzaService.savePizza(existingPizza);
+        redirectAttributes.addFlashAttribute("successMessage", "Pizza updated successfully!");
         return "redirect:/account";
     }
 
